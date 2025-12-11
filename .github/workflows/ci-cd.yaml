@@ -1,7 +1,7 @@
 name: CI Workflow
 on:
   push:
-    branch: olt
+    branch: follow
 
 jobs:
   build:
@@ -25,3 +25,19 @@ jobs:
         uses: actions/upload-pages-artifact@v3  # https://github.com/marketplace/actions/upload-github-pages-artifact
         with:
           path: frontend/build
+
+  security-audit:
+    name: Audit Dependencies
+    needs: build  # Needs 'build' job to run and succeed before executing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Ensure Node is Installed with Right version
+        uses: actions/setup-node@v6
+        with:
+          node-version: 16.x
+
+      - name: Audit
+        run: cd frontent && npm audit --omit=dev
